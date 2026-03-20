@@ -10,7 +10,7 @@ const state = {
   typingTimer: null,
 };
 
-const DEFAULT_WS_URL = "ws://217.216.40.246:9010/ws";
+const DEFAULT_WS_URL = "ws://217.216.40.246:9011/ws";
 const DEFAULT_RECONNECT_DELAY = 2;
 
 const $ = (id) => document.getElementById(id);

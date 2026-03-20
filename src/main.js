@@ -15,6 +15,12 @@ function getPythonCommand() {
   if (process.env.PYCHATTER_PYTHON) {
     return { cmd: process.env.PYCHATTER_PYTHON, args: [bridgePath()] };
   }
+  const venvPython = process.platform === "win32"
+    ? path.join(__dirname, "..", ".venv", "Scripts", "python.exe")
+    : path.join(__dirname, "..", ".venv", "bin", "python3");
+  if (fs.existsSync(venvPython)) {
+    return { cmd: venvPython, args: [bridgePath()] };
+  }
   return { cmd: process.platform === "win32" ? "py" : "python3", args: process.platform === "win32" ? ["-3", bridgePath()] : [bridgePath()] };
 }
 
