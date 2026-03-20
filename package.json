@@ -1,0 +1,33 @@
+{
+  "name": "pychatter-win-client",
+  "version": "0.2.0",
+  "description": "PyChatter Windows desktop client (Electron + Python bridge)",
+  "main": "src/main.js",
+  "author": "PyChatter",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.pychatter.winclient",
+    "productName": "PyChatter",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "python/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^36.0.0",
+    "electron-builder": "^26.0.12"
+  }
+}
