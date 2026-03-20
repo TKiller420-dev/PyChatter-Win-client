@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import queue
 import threading
@@ -89,17 +89,23 @@ class PyChatterClient(ctk.CTk):
         self.settings_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     def _build_ui(self) -> None:
+        self.configure(fg_color="#313338")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        self.topbar = ctk.CTkFrame(self, corner_radius=0, height=44)
+        self.topbar = ctk.CTkFrame(self, corner_radius=0, height=44, fg_color="#232428")
         self.topbar.grid(row=0, column=0, sticky="nsew")
         self.topbar.grid_columnconfigure(1, weight=1)
 
-        brand = ctk.CTkLabel(self.topbar, text="PyChatter", font=ctk.CTkFont(size=17, weight="bold"))
+        brand = ctk.CTkLabel(
+            self.topbar,
+            text="PYCHATTER",
+            text_color="#bfdbfe",
+            font=ctk.CTkFont(size=13, weight="bold"),
+        )
         brand.grid(row=0, column=0, padx=14, pady=10)
 
-        self.connection_state_label = ctk.CTkLabel(self.topbar, text="Connecting...", text_color="#d8dee9")
+        self.connection_state_label = ctk.CTkLabel(self.topbar, text="Connecting...", text_color="#b5bac1")
         self.connection_state_label.grid(row=0, column=1, padx=8, pady=10, sticky="w")
 
         self.reconnect_btn = ctk.CTkButton(
@@ -107,80 +113,122 @@ class PyChatterClient(ctk.CTk):
             text="Reconnect",
             width=110,
             command=self._manual_reconnect,
+            fg_color="#3a3d45",
+            hover_color="#4a4d56",
+            border_width=1,
+            border_color="#51555f",
         )
         self.reconnect_btn.grid(row=0, column=2, padx=(0, 12), pady=8)
 
-        self.auth_view = ctk.CTkFrame(self, corner_radius=0)
+        self.auth_view = ctk.CTkFrame(self, corner_radius=0, fg_color="#0f172a")
         self.auth_view.grid(row=1, column=0, sticky="nsew")
         self.auth_view.grid_columnconfigure(0, weight=1)
         self.auth_view.grid_rowconfigure(0, weight=1)
 
-        auth_card = ctk.CTkFrame(self.auth_view, width=500, height=500)
+        auth_card = ctk.CTkFrame(
+            self.auth_view,
+            width=520,
+            height=520,
+            corner_radius=16,
+            fg_color="#111827",
+            border_width=1,
+            border_color="#334155",
+        )
         auth_card.grid(row=0, column=0)
         auth_card.grid_propagate(False)
         auth_card.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(auth_card, text="Welcome to PyChatter", font=ctk.CTkFont(size=26, weight="bold")).grid(
-            row=0, column=0, padx=26, pady=(26, 10), sticky="w"
+        ctk.CTkLabel(
+            auth_card,
+            text="PYCHATTER",
+            text_color="#bfdbfe",
+            font=ctk.CTkFont(size=12, weight="bold"),
+        ).grid(row=0, column=0, padx=26, pady=(26, 6), sticky="w")
+
+        ctk.CTkLabel(auth_card, text="Welcome back", font=ctk.CTkFont(size=26, weight="bold")).grid(
+            row=1, column=0, padx=26, pady=(0, 8), sticky="w"
         )
         ctk.CTkLabel(
             auth_card,
-            text="Sign in or register, then join your channels.",
-            text_color="#aab0c0",
-        ).grid(row=1, column=0, padx=26, pady=(0, 16), sticky="w")
+            text="Log in to continue chatting with your server.",
+            text_color="#cbd5e1",
+        ).grid(row=2, column=0, padx=26, pady=(0, 16), sticky="w")
 
         self.auth_mode = ctk.StringVar(value="login")
-        mode_menu = ctk.CTkOptionMenu(auth_card, values=["login", "register"], variable=self.auth_mode)
-        mode_menu.grid(row=2, column=0, padx=26, pady=(0, 14), sticky="ew")
+        mode_menu = ctk.CTkSegmentedButton(
+            auth_card,
+            values=["login", "register"],
+            variable=self.auth_mode,
+            selected_color="#1d4ed8",
+            selected_hover_color="#1e40af",
+            unselected_color="#0b1220",
+            unselected_hover_color="#1f2937",
+        )
+        mode_menu.grid(row=3, column=0, padx=26, pady=(0, 14), sticky="ew")
 
         self.username_entry = ctk.CTkEntry(auth_card, placeholder_text="Username")
-        self.username_entry.grid(row=3, column=0, padx=26, pady=8, sticky="ew")
+        self.username_entry.grid(row=4, column=0, padx=26, pady=8, sticky="ew")
 
         self.password_entry = ctk.CTkEntry(auth_card, placeholder_text="Password", show="*")
-        self.password_entry.grid(row=4, column=0, padx=26, pady=8, sticky="ew")
+        self.password_entry.grid(row=5, column=0, padx=26, pady=8, sticky="ew")
 
         self.ws_url_entry = ctk.CTkEntry(auth_card, placeholder_text="WebSocket URL")
         self.ws_url_entry.insert(0, self.settings.ws_url)
-        self.ws_url_entry.grid(row=5, column=0, padx=26, pady=(16, 8), sticky="ew")
+        self.ws_url_entry.grid(row=6, column=0, padx=26, pady=(16, 8), sticky="ew")
 
         self.reconnect_delay_entry = ctk.CTkEntry(auth_card, placeholder_text="Reconnect delay seconds")
         self.reconnect_delay_entry.insert(0, str(self.settings.reconnect_delay))
-        self.reconnect_delay_entry.grid(row=6, column=0, padx=26, pady=8, sticky="ew")
+        self.reconnect_delay_entry.grid(row=7, column=0, padx=26, pady=8, sticky="ew")
 
         self.auth_status = ctk.CTkLabel(auth_card, text="", text_color="#ff8a9c")
-        self.auth_status.grid(row=7, column=0, padx=26, pady=(6, 6), sticky="w")
+        self.auth_status.grid(row=8, column=0, padx=26, pady=(6, 6), sticky="w")
 
         auth_btns = ctk.CTkFrame(auth_card, fg_color="transparent")
-        auth_btns.grid(row=8, column=0, padx=26, pady=(10, 14), sticky="ew")
+        auth_btns.grid(row=9, column=0, padx=26, pady=(10, 14), sticky="ew")
         auth_btns.grid_columnconfigure((0, 1), weight=1)
 
-        save_btn = ctk.CTkButton(auth_btns, text="Save Connection", command=self._save_connection_settings)
+        save_btn = ctk.CTkButton(
+            auth_btns,
+            text="Save Connection",
+            command=self._save_connection_settings,
+            fg_color="#3a3d45",
+            hover_color="#4a4d56",
+            border_width=1,
+            border_color="#51555f",
+        )
         save_btn.grid(row=0, column=0, padx=(0, 6), sticky="ew")
 
-        submit_btn = ctk.CTkButton(auth_btns, text="Continue", command=self._submit_auth)
+        submit_btn = ctk.CTkButton(
+            auth_btns,
+            text="Continue",
+            command=self._submit_auth,
+            fg_color="#3b82f6",
+            hover_color="#2563eb",
+        )
         submit_btn.grid(row=0, column=1, padx=(6, 0), sticky="ew")
 
-        self.app_view = ctk.CTkFrame(self, corner_radius=0)
+        self.app_view = ctk.CTkFrame(self, corner_radius=0, fg_color="#313338")
         self.app_view.grid(row=1, column=0, sticky="nsew")
         self.app_view.grid_columnconfigure(0, weight=0)
         self.app_view.grid_columnconfigure(1, weight=1)
         self.app_view.grid_columnconfigure(2, weight=0)
         self.app_view.grid_rowconfigure(0, weight=1)
 
-        self.channels_pane = ctk.CTkFrame(self.app_view, width=250)
-        self.channels_pane.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=10)
+        self.channels_pane = ctk.CTkFrame(self.app_view, width=260, fg_color="#232428", corner_radius=0)
+        self.channels_pane.grid(row=0, column=0, sticky="nsew")
         self.channels_pane.grid_propagate(False)
         self.channels_pane.grid_rowconfigure(1, weight=1)
 
-        ctk.CTkLabel(self.channels_pane, text="Text Channels", font=ctk.CTkFont(weight="bold")).grid(
+        ctk.CTkLabel(self.channels_pane, text="TEXT CHANNELS", text_color="#b5bac1", font=ctk.CTkFont(weight="bold")).grid(
             row=0, column=0, padx=12, pady=(12, 6), sticky="w"
         )
 
         self.channels_listbox = tk.Listbox(
             self.channels_pane,
-            bg="#1f2937",
-            fg="#e5e7eb",
-            selectbackground="#2563eb",
+            bg="#232428",
+            fg="#c5cad3",
+            selectbackground="#40444b",
+            selectforeground="#f2f3f5",
             borderwidth=0,
             highlightthickness=0,
             activestyle="none",
@@ -192,70 +240,96 @@ class PyChatterClient(ctk.CTk):
         channel_buttons.grid(row=2, column=0, padx=12, pady=(4, 12), sticky="ew")
         channel_buttons.grid_columnconfigure((0, 1), weight=1)
 
-        ctk.CTkButton(channel_buttons, text="New Channel", command=self._new_channel).grid(
+        ctk.CTkButton(
+            channel_buttons,
+            text="New Channel",
+            command=self._new_channel,
+            fg_color="#3a3d45",
+            hover_color="#4a4d56",
+            border_width=1,
+            border_color="#51555f",
+        ).grid(
             row=0, column=0, padx=(0, 6), sticky="ew"
         )
-        ctk.CTkButton(channel_buttons, text="Refresh Users", command=lambda: self._send({"type": "who"})).grid(
+        ctk.CTkButton(
+            channel_buttons,
+            text="Refresh Users",
+            command=lambda: self._send({"type": "who"}),
+            fg_color="#3a3d45",
+            hover_color="#4a4d56",
+            border_width=1,
+            border_color="#51555f",
+        ).grid(
             row=0, column=1, padx=(6, 0), sticky="ew"
         )
 
-        center = ctk.CTkFrame(self.app_view)
-        center.grid(row=0, column=1, sticky="nsew", padx=5, pady=10)
+        center = ctk.CTkFrame(self.app_view, fg_color="#2b2d31", corner_radius=0)
+        center.grid(row=0, column=1, sticky="nsew")
         center.grid_columnconfigure(0, weight=1)
         center.grid_rowconfigure(1, weight=1)
 
-        header = ctk.CTkFrame(center)
-        header.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 6))
+        header = ctk.CTkFrame(center, fg_color="#2b2d31")
+        header.grid(row=0, column=0, sticky="ew", padx=10, pady=(8, 6))
         header.grid_columnconfigure(0, weight=1)
 
         self.channel_title_label = ctk.CTkLabel(header, text="#general", font=ctk.CTkFont(size=20, weight="bold"))
         self.channel_title_label.grid(row=0, column=0, padx=8, pady=8, sticky="w")
 
-        self.role_badge = ctk.CTkLabel(header, text="member", text_color="#a7f3d0")
+        self.role_badge = ctk.CTkLabel(
+            header,
+            text="member",
+            text_color="#86efac",
+            fg_color="#0f2d20",
+            corner_radius=12,
+            padx=10,
+            pady=3,
+        )
         self.role_badge.grid(row=0, column=1, padx=8, pady=8, sticky="e")
 
         self.messages_text = tk.Text(
             center,
-            bg="#111827",
-            fg="#e5e7eb",
+            bg="#2b2d31",
+            fg="#f2f3f5",
             wrap="word",
             borderwidth=0,
             highlightthickness=0,
             state="disabled",
             font=("Segoe UI", 10),
+            insertbackground="#f2f3f5",
         )
         self.messages_text.grid(row=1, column=0, sticky="nsew", padx=10, pady=6)
 
-        self.typing_label = ctk.CTkLabel(center, text="", text_color="#9ca3af")
+        self.typing_label = ctk.CTkLabel(center, text="", text_color="#b5bac1")
         self.typing_label.grid(row=2, column=0, sticky="w", padx=12)
 
-        compose = ctk.CTkFrame(center)
+        compose = ctk.CTkFrame(center, fg_color="#2b2d31")
         compose.grid(row=3, column=0, sticky="ew", padx=10, pady=(8, 10))
         compose.grid_columnconfigure(0, weight=1)
 
-        self.message_entry = ctk.CTkEntry(compose, placeholder_text="Message #general")
+        self.message_entry = ctk.CTkEntry(compose, placeholder_text="Message #general", fg_color="#1f2228")
         self.message_entry.grid(row=0, column=0, padx=(10, 8), pady=10, sticky="ew")
         self.message_entry.bind("<Return>", lambda _e: self._send_message())
         self.message_entry.bind("<KeyRelease>", self._send_typing)
 
-        ctk.CTkButton(compose, text="Send", width=90, command=self._send_message).grid(
+        ctk.CTkButton(compose, text="Send", width=90, command=self._send_message, fg_color="#3b82f6", hover_color="#2563eb").grid(
             row=0, column=1, padx=(0, 10), pady=10
         )
 
-        self.users_pane = ctk.CTkFrame(self.app_view, width=270)
-        self.users_pane.grid(row=0, column=2, sticky="nsew", padx=(5, 10), pady=10)
+        self.users_pane = ctk.CTkFrame(self.app_view, width=260, fg_color="#232428", corner_radius=0)
+        self.users_pane.grid(row=0, column=2, sticky="nsew")
         self.users_pane.grid_propagate(False)
         self.users_pane.grid_rowconfigure(1, weight=1)
 
-        ctk.CTkLabel(self.users_pane, text="Members", font=ctk.CTkFont(weight="bold")).grid(
+        ctk.CTkLabel(self.users_pane, text="MEMBERS", text_color="#b5bac1", font=ctk.CTkFont(weight="bold")).grid(
             row=0, column=0, padx=12, pady=(12, 6), sticky="w"
         )
 
         self.users_listbox = tk.Listbox(
             self.users_pane,
-            bg="#1f2937",
-            fg="#e5e7eb",
-            selectbackground="#2563eb",
+            bg="#232428",
+            fg="#c5cad3",
+            selectbackground="#40444b",
+            selectforeground="#f2f3f5",
             borderwidth=0,
             highlightthickness=0,
             activestyle="none",
@@ -275,7 +349,15 @@ class PyChatterClient(ctk.CTk):
                 ("Set Role", self._set_role),
             ]
         ):
-            ctk.CTkButton(actions, text=label, command=callback).grid(row=row, column=0, pady=4, sticky="ew")
+            ctk.CTkButton(
+                actions,
+                text=label,
+                command=callback,
+                fg_color="#3a3d45",
+                hover_color="#4a4d56",
+                border_width=1,
+                border_color="#51555f",
+            ).grid(row=row, column=0, pady=4, sticky="ew")
 
         self._set_app_visible(False)
 
@@ -329,10 +411,10 @@ class PyChatterClient(ctk.CTk):
         self.stop_event.clear()
         ws_url = self.settings.ws_url
 
-        def on_open(_ws: websocket.WebSocketApp) -> None:
+        def on_open(_ws: Any) -> None:
             self.events.put(("status", "Connected"))
 
-        def on_message(_ws: websocket.WebSocketApp, message: str) -> None:
+        def on_message(_ws: Any, message: Any) -> None:
             try:
                 packet = json.loads(message)
             except json.JSONDecodeError:
@@ -340,10 +422,10 @@ class PyChatterClient(ctk.CTk):
                 return
             self.events.put(("packet", packet))
 
-        def on_error(_ws: websocket.WebSocketApp, error: Any) -> None:
+        def on_error(_ws: Any, error: Any) -> None:
             self.events.put(("status", f"Connection error: {error}"))
 
-        def on_close(_ws: websocket.WebSocketApp, _code: Any, _reason: Any) -> None:
+        def on_close(_ws: Any, _code: Any, _reason: Any) -> None:
             self.events.put(("status", "Disconnected"))
             if not self.stop_event.is_set():
                 self._schedule_reconnect()

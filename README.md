@@ -1,6 +1,6 @@
-# PyChatter Windows Client (Python)
+# PyChatter Windows Client (Electron + Python Bridge)
 
-Python desktop client for PyChatter on Windows 10.
+Electron desktop client for PyChatter on Windows, with a Python bridge process for WebSocket transport.
 
 ## Features
 
@@ -14,12 +14,14 @@ Python desktop client for PyChatter on Windows 10.
 
 ## Requirements
 
+- Node.js 18+
 - Python 3.10+
 - Running PyChatter backend + web bridge (WebSocket endpoint)
 
 ## Setup
 
 ```bash
+npm install
 python -m venv .venv
 .venv\\Scripts\\activate
 pip install -r requirements.txt
@@ -28,7 +30,7 @@ pip install -r requirements.txt
 ## Run
 
 ```bash
-python app.py
+npm start
 ```
 
 By default, it connects to:
@@ -42,12 +44,11 @@ You can change the WebSocket URL and reconnect delay in the login screen and sav
 ## Build EXE (Windows)
 
 ```bash
-pip install pyinstaller
-pyinstaller --noconfirm --windowed --name PyChatter app.py
+npm run dist:win
 ```
 
 Output executable:
 
 ```text
-dist\\PyChatter\\PyChatter.exe
+dist\\
 ```
