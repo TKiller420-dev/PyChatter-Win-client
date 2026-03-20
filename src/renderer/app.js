@@ -25,9 +25,6 @@ const ui = {
   authForm: $("authForm"),
   usernameInput: $("usernameInput"),
   passwordInput: $("passwordInput"),
-  wsUrlInput: $("wsUrlInput"),
-  reconnectDelayInput: $("reconnectDelayInput"),
-  saveConnectionBtn: $("saveConnectionBtn"),
   authSubmitBtn: $("authSubmitBtn"),
   authStatus: $("authStatus"),
   channels: $("channels"),
@@ -85,27 +82,6 @@ async function sendPacket(packet) {
   if (!ok) {
     appendSystem("Bridge not connected. Try restarting bridge.");
   }
-}
-
-async function saveConnectionSettings() {
-  const wsUrl = ui.wsUrlInput.value.trim() || DEFAULT_WS_URL;
-  const reconnectDelayRaw = ui.reconnectDelayInput.value.trim();
-  const reconnectDelay = reconnectDelayRaw ? Number(reconnectDelayRaw) : DEFAULT_RECONNECT_DELAY;
-
-  if (!Number.isFinite(reconnectDelay)) {
-    setAuthStatus("Reconnect delay must be a number");
-    return;
-  }
-
-  await bridgeCommand({
-    command: "set_settings",
-    settings: {
-      ws_url: wsUrl,
-      reconnect_delay: Math.max(0.5, Math.min(10, reconnectDelay)),
-    },
-  });
-
-  setAuthStatus("Connection settings saved", true);
 }
 
 async function handleAuthSubmit(event) {
@@ -324,9 +300,10 @@ function handleBridgeEvent(event) {
 
   if (event.event === "settings") {
     const wsUrl = event.settings?.ws_url || DEFAULT_WS_URL;
-    const reconnectDelay = String(event.settings?.reconnect_delay ?? DEFAULT_RECONNECT_DELAY);
-    ui.wsUrlInput.value = wsUrl;
-    ui.reconnectDelayInput.value = reconnectDelay;
+    const reconnectDelay = Number(event.settings?.reconnect_delay ?? DEFAULT_RECONNECT_DELAY);
+    if (wsUrl !== DEFAULT_WS_URL || reconnectDelay !== DEFAULT_RECONNECT_DELAY) {
+      appendSystem("Custom connection settings are active");
+    }
     return;
   }
 
@@ -339,7 +316,6 @@ function initActions() {
   ui.showLoginBtn.addEventListener("click", () => setMode("login"));
   ui.showRegisterBtn.addEventListener("click", () => setMode("register"));
   ui.authForm.addEventListener("submit", handleAuthSubmit);
-  ui.saveConnectionBtn.addEventListener("click", saveConnectionSettings);
 
   ui.sendBtn.addEventListener("click", sendMessage);
   ui.messageInput.addEventListener("keydown", (event) => {
