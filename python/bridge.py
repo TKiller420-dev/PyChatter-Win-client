@@ -10,9 +10,10 @@ from typing import Any
 import websocket
 
 DEFAULT_SETTINGS = {
-    "ws_url": "ws://127.0.0.1:9011/ws",
+    "ws_url": "ws://217.216.40.246:9010/ws",
     "reconnect_delay": 2.0,
 }
+LEGACY_LOCAL_WS_URL = "ws://127.0.0.1:9011/ws"
 
 
 def emit(payload: dict[str, Any]) -> None:
@@ -49,6 +50,8 @@ class Bridge:
             return dict(DEFAULT_SETTINGS)
 
         ws_url = str(data.get("ws_url", DEFAULT_SETTINGS["ws_url"])).strip() or DEFAULT_SETTINGS["ws_url"]
+        if ws_url == LEGACY_LOCAL_WS_URL:
+            ws_url = DEFAULT_SETTINGS["ws_url"]
         reconnect_delay = data.get("reconnect_delay", DEFAULT_SETTINGS["reconnect_delay"])
         try:
             reconnect_delay = float(reconnect_delay)

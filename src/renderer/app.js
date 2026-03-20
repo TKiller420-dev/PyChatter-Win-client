@@ -10,6 +10,9 @@ const state = {
   typingTimer: null,
 };
 
+const DEFAULT_WS_URL = "ws://217.216.40.246:9010/ws";
+const DEFAULT_RECONNECT_DELAY = 2;
+
 const $ = (id) => document.getElementById(id);
 
 const ui = {
@@ -85,13 +88,9 @@ async function sendPacket(packet) {
 }
 
 async function saveConnectionSettings() {
-  const wsUrl = ui.wsUrlInput.value.trim();
-  const reconnectDelay = Number(ui.reconnectDelayInput.value.trim());
-
-  if (!wsUrl) {
-    setAuthStatus("WebSocket URL is required");
-    return;
-  }
+  const wsUrl = ui.wsUrlInput.value.trim() || DEFAULT_WS_URL;
+  const reconnectDelayRaw = ui.reconnectDelayInput.value.trim();
+  const reconnectDelay = reconnectDelayRaw ? Number(reconnectDelayRaw) : DEFAULT_RECONNECT_DELAY;
 
   if (!Number.isFinite(reconnectDelay)) {
     setAuthStatus("Reconnect delay must be a number");
@@ -324,8 +323,8 @@ function handleBridgeEvent(event) {
   }
 
   if (event.event === "settings") {
-    const wsUrl = event.settings?.ws_url || "ws://127.0.0.1:9011/ws";
-    const reconnectDelay = String(event.settings?.reconnect_delay ?? 2);
+    const wsUrl = event.settings?.ws_url || DEFAULT_WS_URL;
+    const reconnectDelay = String(event.settings?.reconnect_delay ?? DEFAULT_RECONNECT_DELAY);
     ui.wsUrlInput.value = wsUrl;
     ui.reconnectDelayInput.value = reconnectDelay;
     return;
